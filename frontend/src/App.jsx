@@ -119,10 +119,10 @@ export default function App() {
         <div className="page-content">
           {activePage === "overview" && (
             <Overview
-              results={profileResults}
-              reconcileResults={reconcileResults}
-              onNavigate={navigate}
-            />
+  results={profileResults}
+  reconcileResults={reconcileResults}
+  onNavigate={navigate}
+/>
           )}
 
           {activePage === "profiling" && (
