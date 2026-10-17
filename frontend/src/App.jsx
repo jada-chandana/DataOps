@@ -1,122 +1,162 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+import { useState } from "react";
+import "./App.css";
+
+import Sidebar from "./components/Sidebar";
+import Topbar from "./components/topbar";
+
+import Overview from "./pages/Overview";
+import DataProfiling from "./pages/DataProfiling";
+import Reconciliation from "./pages/Reconciliation";
+import Reports from "./pages/Reports";
+import Settings from "./pages/Settings";
+
+const pages = {
+  overview: {
+    title: "Overview",
+    description: "Monitor your data quality workspace.",
+  },
+  profiling: {
+    title: "Data Profiling",
+    description: "Inspect CSV datasets and identify quality issues.",
+  },
+  reconciliation: {
+    title: "Reconciliation",
+    description: "Compare source and target records.",
+  },
+  reports: {
+    title: "Reports",
+    description: "Download your analysis and reconciliation reports.",
+  },
+  settings: {
+    title: "Settings",
+    description: "Manage your workspace preferences.",
+  },
+};
+
+export default function App() {
+  const [activePage, setActivePage] = useState("overview");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const [profileResults, setProfileResults] = useState(null);
+
+  const [reconcileResults, setReconcileResults] = useState(null);
+  const [sourceFile, setSourceFile] = useState(null);
+  const [targetFile, setTargetFile] = useState(null);
+  const [keyColumn, setKeyColumn] = useState("");
+
+  function navigate(page) {
+    setActivePage(page);
+    setSidebarOpen(false);
+  }
+
+  function downloadJSON(report, filename) {
+    const blob = new Blob(
+      [JSON.stringify(report, null, 2)],
+      { type: "application/json" }
+    );
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = filename;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function handleReportDownload(type) {
+    if (!reconcileResults) return;
+
+    if (type === "full") {
+      downloadJSON(
+        {
+          reportName: "DataOps One Record Reconciliation",
+          generatedAt: new Date().toISOString(),
+          sourceFileName: sourceFile?.name || "",
+          targetFileName: targetFile?.name || "",
+          ...reconcileResults,
+        },
+        "reconciliation-report.json"
+      );
+      return;
+    }
+
+    downloadJSON(
+      {
+        reportName: "DataOps One Mismatch Report",
+        generatedAt: new Date().toISOString(),
+        keyColumn: reconcileResults.keyColumn,
+        mismatchCount: reconcileResults.mismatchedCount,
+        mismatchedRecords:
+          reconcileResults.mismatchedRecords || [],
+      },
+      "reconciliation-mismatches.json"
+    );
+  }
+
+  const page = pages[activePage];
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="dashboard">
+      <Sidebar
+        activePage={activePage}
+        onNavigate={navigate}
+        open={sidebarOpen}
+      />
 
-      <div className="ticks"></div>
+      <main className="main-area">
+        <Topbar
+          title={page.title}
+          description={page.description}
+          onMenuClick={() => setSidebarOpen((open) => !open)}
+        />
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        <div className="page-content">
+          {activePage === "overview" && (
+            <Overview
+              results={profileResults}
+              reconcileResults={reconcileResults}
+              onNavigate={navigate}
+            />
+          )}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+          {activePage === "profiling" && (
+            <DataProfiling onResults={setProfileResults} />
+          )}
+
+          {activePage === "reconciliation" && (
+            <Reconciliation
+              reconcileResults={reconcileResults}
+              setReconcileResults={setReconcileResults}
+              sourceFile={sourceFile}
+              setSourceFile={setSourceFile}
+              targetFile={targetFile}
+              setTargetFile={setTargetFile}
+              keyColumn={keyColumn}
+              setKeyColumn={setKeyColumn}
+            />
+          )}
+
+          {activePage === "reports" && (
+            <Reports
+              reconcileResults={reconcileResults}
+              onDownload={handleReportDownload}
+            />
+          )}
+
+          {activePage === "settings" && <Settings />}
+        </div>
+
+        <footer className="footer">
+          <span>DataOps One</span>
+          <span>Data quality made simpler.</span>
+        </footer>
+      </main>
+    </div>
+  );
 }
-
-export default App
