@@ -1,6 +1,7 @@
 
 import FilePicker from "../components/FilePicker";
 import StatCard from "../components/StatCard";
+import "./recolination.css";
 
 const API_URL =
   "http://localhost:5000/api/profile/reconcile-records";
@@ -12,21 +13,11 @@ export default function Reconciliation({
   setSourceFile,
   targetFile,
   setTargetFile,
-  keyColumn,
-  setKeyColumn,
 }) {
-  // Reconciliation loading and error states
-  const [unused] = [null];
-
   // Run source-to-target reconciliation
   async function handleReconcile() {
     if (!sourceFile || !targetFile) {
       alert("Please select both source and target CSV files.");
-      return;
-    }
-
-    if (!keyColumn.trim()) {
-      alert("Please enter a unique key column, such as Employee_ID.");
       return;
     }
 
@@ -39,7 +30,6 @@ export default function Reconciliation({
 
       formData.append("sourceFile", sourceFile);
       formData.append("targetFile", targetFile);
-      formData.append("keyColumn", keyColumn.trim());
 
       const response = await fetch(API_URL, {
         method: "POST",
@@ -65,7 +55,7 @@ export default function Reconciliation({
     }
   }
 
-  // Download a JSON report
+  // Download JSON report
   function downloadJSON(report, filename) {
     const blob = new Blob(
       [JSON.stringify(report, null, 2)],
@@ -85,9 +75,13 @@ export default function Reconciliation({
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
+  // Download full reconciliation report
   function downloadFullReport() {
-    if (!reconcileResults || reconcileResults._loading ||
-        reconcileResults._error) {
+    if (
+      !reconcileResults ||
+      reconcileResults._loading ||
+      reconcileResults._error
+    ) {
       return;
     }
 
@@ -103,9 +97,13 @@ export default function Reconciliation({
     );
   }
 
+  // Download mismatch report
   function downloadMismatchReport() {
-    if (!reconcileResults || reconcileResults._loading ||
-        reconcileResults._error) {
+    if (
+      !reconcileResults ||
+      reconcileResults._loading ||
+      reconcileResults._error
+    ) {
       return;
     }
 
@@ -113,7 +111,7 @@ export default function Reconciliation({
       {
         reportName: "DataOps One Mismatch Report",
         generatedAt: new Date().toISOString(),
-        keyColumn: reconcileResults.keyColumn,
+        keyColumn: reconcileResults.keyColumn || null,
         mismatchCount: reconcileResults.mismatchedCount,
         mismatchedRecords:
           reconcileResults.mismatchedRecords || [],
@@ -124,13 +122,16 @@ export default function Reconciliation({
 
   const loading = reconcileResults?._loading === true;
   const error = reconcileResults?._error;
+
   const results =
     reconcileResults && !loading && !error
       ? reconcileResults
       : null;
 
   return (
-    <section className="content-section">
+    <section className="content-section reconciliation-page">
+
+      {/* Page Header */}
       <div className="section-heading">
         <div>
           <h2>Source-to-Target Reconciliation</h2>
@@ -141,7 +142,9 @@ export default function Reconciliation({
         </div>
       </div>
 
+      {/* File Upload Section */}
       <div className="upload-card">
+
         <div className="file-columns">
           <FilePicker
             title="Source CSV"
@@ -164,25 +167,10 @@ export default function Reconciliation({
           />
         </div>
 
-        <label className="field-label">
-          <strong>Unique Key Column</strong>
-
-          <input
-            className="text-input"
-            type="text"
-            value={keyColumn}
-            onChange={(event) => {
-              setKeyColumn(event.target.value);
-              setReconcileResults(null);
-            }}
-            placeholder="Example: Employee_ID"
-          />
-
-          <span className="helper-text">
-            Enter a column that exists in both CSV files and
-            contains unique, non-empty values.
-          </span>
-        </label>
+        <p className="helper-text">
+          DataOps One will automatically identify a suitable
+          unique key column from both datasets.
+        </p>
 
         <button
           type="button"
@@ -193,15 +181,37 @@ export default function Reconciliation({
           {loading ? "Reconciling..." : "Run Reconciliation"}
         </button>
 
-        {error && <p className="error">{error}</p>}
+        {loading && (
+          <p className="helper-text">
+            Comparing source and target records...
+          </p>
+        )}
+
+        {error && (
+          <p className="error">
+            {error}
+          </p>
+        )}
       </div>
 
+      {/* Reconciliation Results */}
       {results && (
         <>
+          {/* Results Header */}
           <div className="results-heading">
             <div>
-              <p className="eyebrow">RECONCILIATION REPORT</p>
+              <p className="eyebrow">
+                RECONCILIATION REPORT
+              </p>
+
               <h2>Record-Level Results</h2>
+
+              {results.keyColumn && (
+                <p>
+                  Automatically selected key:{" "}
+                  <strong>{results.keyColumn}</strong>
+                </p>
+              )}
             </div>
 
             <span
@@ -215,44 +225,48 @@ export default function Reconciliation({
             </span>
           </div>
 
+          {/* Statistics */}
           <div className="stats-grid">
+
             <StatCard
               label="Source Rows"
-              value={results.sourceRowCount}
+              value={results.sourceRowCount ?? 0}
               icon="▤"
             />
 
             <StatCard
               label="Target Rows"
-              value={results.targetRowCount}
+              value={results.targetRowCount ?? 0}
               icon="▦"
             />
 
             <StatCard
               label="Matched Records"
-              value={results.matchedCount}
+              value={results.matchedCount ?? 0}
               icon="✓"
             />
 
             <StatCard
               label="Missing in Target"
-              value={results.missingInTargetCount}
+              value={results.missingInTargetCount ?? 0}
               icon="!"
             />
 
             <StatCard
               label="Extra in Target"
-              value={results.extraInTargetCount}
+              value={results.extraInTargetCount ?? 0}
               icon="+"
             />
 
             <StatCard
               label="Mismatched Records"
-              value={results.mismatchedCount}
+              value={results.mismatchedCount ?? 0}
               icon="⇄"
             />
+
           </div>
 
+          {/* Schema Validation */}
           <div className="table-card">
             <h3>Schema Validation</h3>
 
@@ -278,7 +292,9 @@ export default function Reconciliation({
             )}
           </div>
 
+          {/* Report Downloads */}
           <div className="report-actions">
+
             <button
               type="button"
               className="primary-button"
@@ -291,13 +307,17 @@ export default function Reconciliation({
               type="button"
               className="secondary-button"
               onClick={downloadMismatchReport}
-              disabled={!results.mismatchedRecords?.length}
+              disabled={
+                !results.mismatchedRecords?.length
+              }
             >
               Download Mismatches Only
             </button>
+
           </div>
         </>
       )}
+
     </section>
   );
 }

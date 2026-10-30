@@ -1,0 +1,322 @@
+
+/* ================================
+   RECONCILIATION PAGE
+================================ */
+
+.reconciliation-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  color: #172033;
+}
+
+/* Page Header */
+
+.reconciliation-page .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.reconciliation-page .page-header h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #101a33;
+  margin: 0;
+}
+
+.reconciliation-page .page-header p {
+  color: #718096;
+  margin-top: 6px;
+  font-size: 14px;
+}
+
+/* General Cards */
+
+.reconciliation-page .reconciliation-card {
+  background: #ffffff;
+  border: 1px solid #e7ebf3;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 4px 14px rgba(16, 26, 51, 0.04);
+}
+
+.reconciliation-page .reconciliation-card h2 {
+  font-size: 18px;
+  color: #101a33;
+  margin: 0 0 8px;
+}
+
+.reconciliation-page .reconciliation-card p {
+  color: #718096;
+  font-size: 13px;
+}
+
+/* Upload Section */
+
+.reconciliation-page .upload-section {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.reconciliation-page .upload-box {
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 24px;
+  background: #f8faff;
+  transition: 0.2s ease;
+}
+
+.reconciliation-page .upload-box:hover {
+  border-color: #3769e8;
+  background: #f1f5ff;
+}
+
+/* Key Column */
+
+.reconciliation-page .key-column {
+  margin-top: 18px;
+}
+
+.reconciliation-page .key-column label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #344054;
+}
+
+.reconciliation-page .key-column input,
+.reconciliation-page .key-column select {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid #d8deea;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+}
+
+.reconciliation-page .key-column input:focus,
+.reconciliation-page .key-column select:focus {
+  border-color: #3769e8;
+  box-shadow: 0 0 0 3px rgba(55, 105, 232, 0.1);
+}
+
+/* Buttons */
+
+.reconciliation-page button {
+  border: none;
+  border-radius: 8px;
+  padding: 11px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.reconciliation-page .primary-btn {
+  background: #3769e8;
+  color: #ffffff;
+}
+
+.reconciliation-page .primary-btn:hover {
+  background: #2854c5;
+  transform: translateY(-1px);
+}
+
+.reconciliation-page .secondary-btn {
+  background: #edf2ff;
+  color: #3769e8;
+}
+
+.reconciliation-page .secondary-btn:hover {
+  background: #dce6ff;
+}
+
+/* Statistics Cards */
+
+.reconciliation-page .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.reconciliation-page .stat-card {
+  background: #ffffff;
+  border: 1px solid #e7ebf3;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 3px 12px rgba(16, 26, 51, 0.04);
+}
+
+.reconciliation-page .stat-card h3 {
+  font-size: 13px;
+  color: #718096;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.reconciliation-page .stat-card .stat-value {
+  font-size: 27px;
+  font-weight: 700;
+  color: #101a33;
+}
+
+/* Chart Card */
+
+.reconciliation-page .chart-card {
+  background: #ffffff;
+  border: 1px solid #e7ebf3;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 4px 14px rgba(16, 26, 51, 0.04);
+}
+
+.reconciliation-page .chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.reconciliation-page .chart-header h2 {
+  font-size: 18px;
+  color: #101a33;
+  margin: 0;
+}
+
+.reconciliation-page .chart-header p {
+  color: #718096;
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+.reconciliation-page .chart-container {
+  width: 100%;
+  min-height: 320px;
+  position: relative;
+}
+
+/* Chart Legend */
+
+.reconciliation-page .chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 16px;
+}
+
+.reconciliation-page .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.reconciliation-page .legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* Schema Comparison */
+
+.reconciliation-page .schema-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.reconciliation-page .schema-item {
+  background: #f8faff;
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid #e7ebf3;
+}
+
+.reconciliation-page .schema-item h3 {
+  font-size: 14px;
+  color: #344054;
+  margin-bottom: 10px;
+}
+
+/* Status Labels */
+
+.reconciliation-page .status-pass {
+  color: #15803d;
+  background: #dcfce7;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.reconciliation-page .status-fail {
+  color: #b91c1c;
+  background: #fee2e2;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Tables */
+
+.reconciliation-page table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 14px;
+  font-size: 13px;
+}
+
+.reconciliation-page th {
+  background: #f1f5fb;
+  color: #475569;
+  font-weight: 600;
+  text-align: left;
+  padding: 13px;
+}
+
+.reconciliation-page td {
+  padding: 13px;
+  border-bottom: 1px solid #edf0f5;
+  color: #475569;
+}
+
+.reconciliation-page tr:hover td {
+  background: #f8faff;
+}
+
+/* Responsive Design */
+
+@media (max-width: 900px) {
+  .reconciliation-page .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 650px) {
+  .reconciliation-page {
+    padding: 14px;
+  }
+
+  .reconciliation-page .upload-section,
+  .reconciliation-page .schema-grid,
+  .reconciliation-page .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .reconciliation-page .chart-container {
+    min-height: 260px;
+  }
+
+  .reconciliation-page .reconciliation-card {
+    padding: 16px;
+  }
+}

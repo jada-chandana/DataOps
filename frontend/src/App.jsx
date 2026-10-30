@@ -10,7 +10,9 @@ import DataProfiling from "./pages/DataProfiling";
 import Reconciliation from "./pages/Reconciliation";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
-
+import DataValidation from "./pages/dataValidation";
+import Cleaning from "./components/Cleaning";
+import DataDrift from "./pages/Datadrift";
 const pages = {
   overview: {
     title: "Overview",
@@ -19,6 +21,10 @@ const pages = {
   profiling: {
     title: "Data Profiling",
     description: "Inspect CSV datasets and identify quality issues.",
+  },
+  cleaning: {
+    title: "Data Cleaning",
+    description: "Clean datasets and improve data quality.",
   },
   reconciliation: {
     title: "Reconciliation",
@@ -32,6 +38,14 @@ const pages = {
     title: "Settings",
     description: "Manage your workspace preferences.",
   },
+  validation: {
+  title: "Data Validation",
+  description: "Automatically detect data quality issues in CSV datasets.",
+},
+drift: {
+  title: "Data Drift Detection",
+  description: "Detect changes in data structure and distribution.",
+},
 };
 
 export default function App() {
@@ -68,6 +82,8 @@ export default function App() {
 
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
+      
+
 
   function handleReportDownload(type) {
     if (!reconcileResults) return;
@@ -96,8 +112,12 @@ export default function App() {
           reconcileResults.mismatchedRecords || [],
       },
       "reconciliation-mismatches.json"
+      
+
     );
+    
   }
+  
 
   const page = pages[activePage];
 
@@ -128,6 +148,7 @@ export default function App() {
           {activePage === "profiling" && (
             <DataProfiling onResults={setProfileResults} />
           )}
+          {activePage === "cleaning" && <Cleaning />}
 
           {activePage === "reconciliation" && (
             <Reconciliation
@@ -140,7 +161,10 @@ export default function App() {
               keyColumn={keyColumn}
               setKeyColumn={setKeyColumn}
             />
+               
           )}
+{activePage === "drift" && <DataDrift />}
+          
 
           {activePage === "reports" && (
             <Reports
@@ -149,7 +173,16 @@ export default function App() {
             />
           )}
 
+                   {activePage === "reports" && (
+            <Reports
+              reconcileResults={reconcileResults}
+              onDownload={handleReportDownload}
+            />
+          )}
+
           {activePage === "settings" && <Settings />}
+
+          {activePage === "validation" && <DataValidation />}
         </div>
 
         <footer className="footer">

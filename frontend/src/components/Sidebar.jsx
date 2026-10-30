@@ -2,7 +2,10 @@
 const navigation = [
   { id: "overview", icon: "▦", label: "Overview" },
   { id: "profiling", icon: "◫", label: "Data Profiling" },
+   { id: "cleaning", icon: "🧹", label: "Data Cleaning" },
+  { id: "validation", icon: "✓", label: "Data Validation" },
   { id: "reconciliation", icon: "⇄", label: "Reconciliation" },
+{ id: "drift", icon: "📊", label: "Data Drift Detection" },
   { id: "reports", icon: "▤", label: "Reports" },
   { id: "settings", icon: "⚙", label: "Settings" },
 ];

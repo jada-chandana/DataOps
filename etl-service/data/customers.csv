@@ -1,0 +1,22 @@
+
+customer_id,name,city,salary
+101,Rahul,Hyderabad,45000
+102,Priya,Bangalore,55000
+103,Arjun, Hyderabad ,60000
+104,Sneha,Chennai,50000
+105,Rahul,Hyderabad,45000
+106,Kiran,Pune,70000
+107,,Mumbai,40000
+108,Ananya,Delhi,-5000
+109,Vikram,,60000
+110,Meena,Chennai,abc
+101,Rahul,Hyderabad,45000
+112,   ,Kolkata,35000
+,Surya,Hyderabad,42000
+114,Divya,Bangalore,
+115,Manoj,Chennai,0
+116,Neha,Delhi,75000
+117,Arjun, Hyderabad ,60000
+118,Kavya,Mumbai,52000
+119,Ravi,Pune,-1000
+120,Teja,Chennai,48000
