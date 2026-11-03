@@ -2,7 +2,14 @@
 import React, { useState } from "react";
 import "./DataDrift.css";
 
-const API_URL = "http://localhost:5000/api/profile/data-drift";
+// ----------------------------------
+// API CONFIGURATION FROM .env
+// ----------------------------------
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+const API_URL = `${API_BASE_URL}/api/profile/data-drift`;
 
 function DataDrift() {
   const [sourceFile, setSourceFile] = useState(null);

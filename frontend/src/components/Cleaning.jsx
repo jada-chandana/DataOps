@@ -2,26 +2,57 @@
 import { useState } from "react";
 import "./Cleaning.css";
 
-const API_URL =
+// ----------------------------------
+// API CONFIGURATION FROM .env
+// ----------------------------------
+
+const API_BASE_URL =
   import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+const CLEANING_API_URL = `${API_BASE_URL}/api/cleaning`;
 
 function Cleaning() {
   const [file, setFile] = useState(null);
+
   const [preview, setPreview] = useState(null);
   const [missingPreview, setMissingPreview] = useState(null);
+  const [duplicatePreview, setDuplicatePreview] = useState(null);
 
   const [loading, setLoading] = useState(false);
+  const [duplicateLoading, setDuplicateLoading] = useState(false);
+
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-const [duplicatePreview, setDuplicatePreview] = useState(null);
-const [duplicateLoading, setDuplicateLoading] = useState(false);
-const [duplicateError, setDuplicateError] = useState("");
-const [duplicateMessage, setDuplicateMessage] = useState("");
-  // Create FormData
+
+  const [duplicateError, setDuplicateError] = useState("");
+  const [duplicateMessage, setDuplicateMessage] = useState("");
+
+  // ----------------------------------
+  // COMMON FORM DATA
+  // ----------------------------------
+
   const createFormData = () => {
     const formData = new FormData();
     formData.append("file", file);
     return formData;
+  };
+
+  // ----------------------------------
+  // COMMON CSV DOWNLOAD HELPER
+  // ----------------------------------
+
+  const downloadFile = (blob, filename) => {
+    const downloadUrl = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = filename;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.URL.revokeObjectURL(downloadUrl);
   };
 
   // ----------------------------------
@@ -42,7 +73,7 @@ const [duplicateMessage, setDuplicateMessage] = useState("");
 
     try {
       const response = await fetch(
-        `${API_URL}/api/cleaning/preview`,
+        `${CLEANING_API_URL}/preview`,
         {
           method: "POST",
           body: createFormData(),
@@ -65,7 +96,7 @@ const [duplicateMessage, setDuplicateMessage] = useState("");
   };
 
   // ----------------------------------
-  // FEATURE 1: DOWNLOAD TRIMMED CSV
+  // FEATURE 1: APPLY TRIM SPACES
   // ----------------------------------
 
   const handleApply = async () => {
@@ -80,7 +111,7 @@ const [duplicateMessage, setDuplicateMessage] = useState("");
 
     try {
       const response = await fetch(
-        `${API_URL}/api/cleaning/apply`,
+        `${CLEANING_API_URL}/apply`,
         {
           method: "POST",
           body: createFormData(),
@@ -93,6 +124,7 @@ const [duplicateMessage, setDuplicateMessage] = useState("");
       }
 
       const blob = await response.blob();
+
       downloadFile(blob, "cleaned_data.csv");
 
       setMessage("Cleaned CSV downloaded successfully.");
@@ -121,7 +153,7 @@ const [duplicateMessage, setDuplicateMessage] = useState("");
 
     try {
       const response = await fetch(
-        `${API_URL}/api/cleaning/missing-preview`,
+        `${CLEANING_API_URL}/missing-preview`,
         {
           method: "POST",
           body: createFormData(),
@@ -149,7 +181,7 @@ const [duplicateMessage, setDuplicateMessage] = useState("");
   };
 
   // ----------------------------------
-  // FEATURE 2: DOWNLOAD MISSING VALUE CSV
+  // FEATURE 2: APPLY MISSING VALUES
   // ----------------------------------
 
   const handleMissingApply = async () => {
@@ -164,7 +196,7 @@ const [duplicateMessage, setDuplicateMessage] = useState("");
 
     try {
       const response = await fetch(
-        `${API_URL}/api/cleaning/missing-apply`,
+        `${CLEANING_API_URL}/missing-apply`,
         {
           method: "POST",
           body: createFormData(),
@@ -192,102 +224,93 @@ const [duplicateMessage, setDuplicateMessage] = useState("");
     }
   };
 
-  
-const handleDuplicatePreview = async () => {
-  if (!file) {
-    setDuplicateError("Please upload a CSV file first.");
-    return;
-  }
+  // ----------------------------------
+  // FEATURE 3: DUPLICATE ROW PREVIEW
+  // ----------------------------------
 
-  try {
+  const handleDuplicatePreview = async () => {
+    if (!file) {
+      setDuplicateError("Please upload a CSV file first.");
+      return;
+    }
+
     setDuplicateLoading(true);
     setDuplicateError("");
     setDuplicateMessage("");
     setDuplicatePreview(null);
 
-    const response = await fetch(
-      `${API_URL}/api/cleaning/duplicates-preview`,
-      {
-        method: "POST",
-        body: createFormData(),
+    try {
+      const response = await fetch(
+        `${CLEANING_API_URL}/duplicates-preview`,
+        {
+          method: "POST",
+          body: createFormData(),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(
+          result.message || "Duplicate detection failed."
+        );
       }
-    );
 
-    const result = await response.json();
+      setDuplicatePreview(result);
 
-    if (!response.ok || !result.success) {
-      throw new Error(result.message || "Duplicate detection failed.");
+      setDuplicateMessage(
+        "Duplicate rows detected successfully."
+      );
+    } catch (err) {
+      setDuplicateError(err.message);
+    } finally {
+      setDuplicateLoading(false);
+    }
+  };
+
+  // ----------------------------------
+  // FEATURE 3: APPLY DUPLICATE REMOVAL
+  // ----------------------------------
+
+  const handleDuplicateApply = async () => {
+    if (!file) {
+      setDuplicateError("Please upload a CSV file first.");
+      return;
     }
 
-    setDuplicatePreview(result);
-    setDuplicateMessage("Duplicate rows detected successfully.");
-  } catch (error) {
-    setDuplicateError(error.message);
-  } finally {
-    setDuplicateLoading(false);
-  }
-};
-
-const handleDuplicateApply = async () => {
-  if (!file) {
-    setDuplicateError("Please upload a CSV file first.");
-    return;
-  }
-
-  try {
     setDuplicateLoading(true);
     setDuplicateError("");
     setDuplicateMessage("");
 
-    const response = await fetch(
-      `${API_URL}/api/cleaning/duplicates-apply`,
-      {
-        method: "POST",
-        body: createFormData(),
+    try {
+      const response = await fetch(
+        `${CLEANING_API_URL}/duplicates-apply`,
+        {
+          method: "POST",
+          body: createFormData(),
+        }
+      );
+
+      if (!response.ok) {
+        const result = await response.json();
+
+        throw new Error(
+          result.message || "Failed to remove duplicates."
+        );
       }
-    );
 
-    if (!response.ok) {
-      const result = await response.json();
-      throw new Error(result.message || "Failed to remove duplicates.");
+      const blob = await response.blob();
+
+      downloadFile(blob, "deduplicated_data.csv");
+
+      setDuplicateMessage(
+        "Duplicates removed. Your CSV has been downloaded."
+      );
+    } catch (err) {
+      setDuplicateError(err.message);
+    } finally {
+      setDuplicateLoading(false);
     }
-
-    const blob = await response.blob();
-    const downloadUrl = window.URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-    link.href = downloadUrl;
-    link.download = "deduplicated_data.csv";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-
-    window.URL.revokeObjectURL(downloadUrl);
-
-    setDuplicateMessage("Duplicates removed. Your CSV has been downloaded.");
-  } catch (error) {
-    setDuplicateError(error.message);
-  } finally {
-    setDuplicateLoading(false);
-  }
-};
-
-  // ----------------------------------
-  // DOWNLOAD HELPER
-  // ----------------------------------
-
-  const downloadFile = (blob, filename) => {
-    const downloadUrl = window.URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-    link.href = downloadUrl;
-    link.download = filename;
-
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-
-    window.URL.revokeObjectURL(downloadUrl);
   };
 
   // ----------------------------------
@@ -299,10 +322,18 @@ const handleDuplicateApply = async () => {
 
     setPreview(null);
     setMissingPreview(null);
+    setDuplicatePreview(null);
 
     setError("");
     setMessage("");
+
+    setDuplicateError("");
+    setDuplicateMessage("");
   };
+
+  // ----------------------------------
+  // UI
+  // ----------------------------------
 
   return (
     <div className="cleaning-container">
@@ -353,14 +384,14 @@ const handleDuplicateApply = async () => {
 
             <button
               onClick={handlePreview}
-              disabled={!file || loading}
+              disabled={!file || loading || duplicateLoading}
             >
               Preview Trim
             </button>
 
             <button
               onClick={handleApply}
-              disabled={!file || loading}
+              disabled={!file || loading || duplicateLoading}
             >
               Download Trimmed CSV
             </button>
@@ -394,14 +425,14 @@ const handleDuplicateApply = async () => {
 
             <button
               onClick={handleMissingPreview}
-              disabled={!file || loading}
+              disabled={!file || loading || duplicateLoading}
             >
               Preview Missing Values
             </button>
 
             <button
               onClick={handleMissingApply}
-              disabled={!file || loading}
+              disabled={!file || loading || duplicateLoading}
             >
               Download Cleaned CSV
             </button>
@@ -489,8 +520,6 @@ const handleDuplicateApply = async () => {
 
           </div>
 
-          {/* COLUMN-WISE MISSING VALUES */}
-
           <h3>Column-wise Missing Values</h3>
 
           <div className="cleaning-table-wrapper">
@@ -525,8 +554,6 @@ const handleDuplicateApply = async () => {
 
           </div>
 
-          {/* BEFORE CLEANING */}
-
           <h3>Before Cleaning</h3>
 
           <DataTable
@@ -534,16 +561,12 @@ const handleDuplicateApply = async () => {
             rows={missingPreview.preview.before}
           />
 
-          {/* AFTER CLEANING */}
-
           <h3>After Cleaning</h3>
 
           <DataTable
             headers={missingPreview.preview.headers}
             rows={missingPreview.preview.after}
           />
-
-          {/* CHANGED CELLS REPORT */}
 
           <ChangesTable
             changes={missingPreview.changes}
@@ -553,82 +576,94 @@ const handleDuplicateApply = async () => {
         </div>
       )}
 
+      {/* DUPLICATE ROW RESULTS */}
 
-{/* DUPLICATE ROWS CLEANING */}
-<section className="cleaning-section">
-  <h2>Remove Duplicate Rows</h2>
+      <section className="cleaning-section">
 
-  <p>
-    Identify duplicate records and keep only the first occurrence
-    of each complete row.
-  </p>
+        <h2>Remove Duplicate Rows</h2>
 
-  <div className="cleaning-actions">
-    <button
-      onClick={handleDuplicatePreview}
-      disabled={!file || duplicateLoading}
-    >
-      {duplicateLoading
-        ? "Processing..."
-        : "Preview Duplicates"}
-    </button>
+        <p>
+          Identify duplicate records and keep only the first
+          occurrence of each complete row.
+        </p>
 
-    <button
-      onClick={handleDuplicateApply}
-      disabled={!file || duplicateLoading}
-    >
-      Remove Duplicates & Download
-    </button>
-  </div>
+        <div className="cleaning-actions">
 
-  {duplicateError && (
-    <p className="error-message">{duplicateError}</p>
-  )}
+          <button
+            onClick={handleDuplicatePreview}
+            disabled={!file || duplicateLoading || loading}
+          >
+            {duplicateLoading
+              ? "Processing..."
+              : "Preview Duplicates"}
+          </button>
 
-  {duplicateMessage && (
-    <p className="success-message">{duplicateMessage}</p>
-  )}
+          <button
+            onClick={handleDuplicateApply}
+            disabled={!file || duplicateLoading || loading}
+          >
+            Remove Duplicates & Download
+          </button>
 
-  {duplicatePreview && (
-    <div className="duplicate-results">
-      <h3>Duplicate Detection Summary</h3>
-
-      <div className="cleaning-stats">
-        <div className="stat-card">
-          <h4>Total Rows</h4>
-          <p>{duplicatePreview.totalRows}</p>
         </div>
 
-        <div className="stat-card">
-          <h4>Duplicate Rows</h4>
-          <p>{duplicatePreview.duplicateRows}</p>
-        </div>
+        {duplicateError && (
+          <p className="error-message">
+            {duplicateError}
+          </p>
+        )}
 
-        <div className="stat-card">
-          <h4>Unique Rows</h4>
-          <p>{duplicatePreview.uniqueRows}</p>
-        </div>
-      </div>
+        {duplicateMessage && (
+          <p className="success-message">
+            {duplicateMessage}
+          </p>
+        )}
 
-      <h3>Duplicate Records</h3>
+        {duplicatePreview && (
+          <div className="duplicate-results">
 
-      {duplicatePreview.preview.duplicates.length > 0 ? (
-        <ChangesTable
-          changes={duplicatePreview.preview.duplicates.map(
-            (item) => ({
-              rowNumber: item.rowNumber,
-              columnName: "Complete Row",
-              before: JSON.stringify(item.data),
-              after: "Removed",
-            })
-          )}
-        />
-      ) : (
-        <p>No duplicate rows found!</p>
-      )}
-    </div>
-  )}
-</section>
+            <h3>Duplicate Detection Summary</h3>
+
+            <div className="cleaning-stats">
+
+              <div className="stat-card">
+                <h4>Total Rows</h4>
+                <p>{duplicatePreview.totalRows}</p>
+              </div>
+
+              <div className="stat-card">
+                <h4>Duplicate Rows</h4>
+                <p>{duplicatePreview.duplicateRows}</p>
+              </div>
+
+              <div className="stat-card">
+                <h4>Unique Rows</h4>
+                <p>{duplicatePreview.uniqueRows}</p>
+              </div>
+
+            </div>
+
+            <h3>Duplicate Records</h3>
+
+            {duplicatePreview.preview.duplicates.length > 0 ? (
+              <ChangesTable
+                changes={duplicatePreview.preview.duplicates.map(
+                  (item) => ({
+                    rowNumber: item.rowNumber,
+                    columnName: "Complete Row",
+                    before: JSON.stringify(item.data),
+                    after: "Removed",
+                  })
+                )}
+              />
+            ) : (
+              <p>No duplicate rows found!</p>
+            )}
+
+          </div>
+        )}
+
+      </section>
 
     </div>
   );
@@ -722,7 +757,7 @@ function ChangesTable({ changes, total }) {
           </table>
 
           <p>
-            Showing {changes.length} of {total} changed cells.
+            Showing {changes.length} of {total ?? changes.length} changed cells.
           </p>
 
         </div>

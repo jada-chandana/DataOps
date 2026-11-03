@@ -4,8 +4,15 @@ import FilePicker from "../components/FilePicker";
 import StatCard from "../components/StatCard";
 import "./DataProfilling.css";
 
-const API_URL = "http://localhost:5000/api/ingestion/csv";
-const QUALITY_API_URL = "http://localhost:5000/api/profile/quality-check";
+// ----------------------------------
+// API CONFIGURATION FROM .env
+// ----------------------------------
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+const API_URL = `${API_BASE_URL}/api/ingestion/csv`;
+const QUALITY_API_URL = `${API_BASE_URL}/api/profile/quality-check`;
 
 export default function DataProfiling({ onResults }) {
   const [file, setFile] = useState(null);
@@ -20,7 +27,10 @@ export default function DataProfiling({ onResults }) {
   const [qualityLoading, setQualityLoading] = useState(false);
   const [qualityError, setQualityError] = useState("");
 
-  // Reset results when a new file is selected
+  // ----------------------------------
+  // FILE SELECTION
+  // ----------------------------------
+
   function handleFileChange(newFile) {
     setFile(newFile);
     setResults(null);
@@ -30,7 +40,10 @@ export default function DataProfiling({ onResults }) {
     onResults?.(null);
   }
 
-  // Common file upload helper
+  // ----------------------------------
+  // COMMON FILE UPLOAD HELPER
+  // ----------------------------------
+
   async function postFile(url) {
     if (!file) {
       throw new Error("Please select a CSV file first.");
@@ -53,7 +66,10 @@ export default function DataProfiling({ onResults }) {
     return data;
   }
 
-  // CSV upload and profiling
+  // ----------------------------------
+  // CSV UPLOAD AND PROFILING
+  // ----------------------------------
+
   async function handleUpload() {
     if (!file) {
       setError("Please select a CSV file first.");
@@ -72,7 +88,9 @@ export default function DataProfiling({ onResults }) {
       const report = data.qualityReport;
 
       if (!report) {
-        throw new Error("Quality report was not returned by the backend.");
+        throw new Error(
+          "Quality report was not returned by the backend."
+        );
       }
 
       setResults(report);
@@ -80,7 +98,7 @@ export default function DataProfiling({ onResults }) {
     } catch (err) {
       setError(
         err.message === "Failed to fetch"
-          ? "Cannot connect to the backend on port 5000."
+          ? "Cannot connect to the backend. Check your backend server."
           : err.message
       );
     } finally {
@@ -88,7 +106,10 @@ export default function DataProfiling({ onResults }) {
     }
   }
 
-  // Standard predefined quality checks
+  // ----------------------------------
+  // STANDARD PREDEFINED QUALITY CHECKS
+  // ----------------------------------
+
   async function handleQualityCheck() {
     if (!file) {
       setQualityError("Please select a CSV file first.");
@@ -105,7 +126,7 @@ export default function DataProfiling({ onResults }) {
     } catch (err) {
       setQualityError(
         err.message === "Failed to fetch"
-          ? "Cannot connect to the backend on port 5000."
+          ? "Cannot connect to the backend. Check your backend server."
           : err.message
       );
     } finally {
@@ -113,7 +134,10 @@ export default function DataProfiling({ onResults }) {
     }
   }
 
-  // Download standard quality issues
+  // ----------------------------------
+  // DOWNLOAD STANDARD QUALITY ISSUES
+  // ----------------------------------
+
   function handleDownloadIssues() {
     if (!qualityResults?.issues?.length) {
       setQualityError("There are no quality issues to download.");
@@ -171,6 +195,10 @@ export default function DataProfiling({ onResults }) {
     }, 1000);
   }
 
+  // ----------------------------------
+  // DERIVED DATA
+  // ----------------------------------
+
   const columns = results?.columns || [];
   const rules = qualityResults?.rules || [];
   const issues = qualityResults?.issues || [];
@@ -182,12 +210,16 @@ export default function DataProfiling({ onResults }) {
     if (status === "FAIL") return "crimson";
     return "#b7791f";
   };
-console.log("QUALITY RESULTS:", qualityResults);
-console.log("SHOULD DISPLAY REPORT:", Boolean(qualityResults));
+
+  // ----------------------------------
+  // UI
+  // ----------------------------------
+
   return (
     <section className="content-section dataops-dashboard">
 
-      {/* Page heading */}
+      {/* PAGE HEADING */}
+
       <div className="section-heading">
         <div>
           <h2>CSV Data Profiler</h2>
@@ -198,8 +230,10 @@ console.log("SHOULD DISPLAY REPORT:", Boolean(qualityResults));
         </div>
       </div>
 
-      {/* File upload */}
+      {/* FILE UPLOAD */}
+
       <div className="upload-card">
+
         <FilePicker
           title="Choose your dataset"
           subtitle="Select a CSV file to analyze"
@@ -215,6 +249,7 @@ console.log("SHOULD DISPLAY REPORT:", Boolean(qualityResults));
             marginTop: "16px",
           }}
         >
+
           <button
             className="primary-button"
             onClick={handleUpload}
@@ -228,41 +263,86 @@ console.log("SHOULD DISPLAY REPORT:", Boolean(qualityResults));
             onClick={handleQualityCheck}
             disabled={loading || qualityLoading || !file}
           >
-            {qualityLoading ? "Checking Quality..." : "Run Quality Checks"}
+            {qualityLoading
+              ? "Checking Quality..."
+              : "Run Quality Checks"}
           </button>
+
         </div>
 
         {error && <p className="error">{error}</p>}
         {qualityError && <p className="error">{qualityError}</p>}
+
       </div>
 
-      {/* CSV profiling dashboard */}
+      {/* CSV PROFILING DASHBOARD */}
+
       {results && (
         <>
+
           <div className="stats-grid">
-            <StatCard label="Total rows" value={results.rowCount} icon="▤" />
-            <StatCard label="Total columns" value={results.columnCount} icon="▦" />
-            <StatCard label="Missing values" value={missingTotal} icon="!" />
-            <StatCard label="Type issues" value={results.typeIssues ?? 0} icon="⚠" />
-            <StatCard label="Completeness" value={`${results.completeness ?? 0}%`} icon="%" />
-            <StatCard label="Duplicate rows" value={results.duplicateRows ?? 0} icon="⧉" />
+
+            <StatCard
+              label="Total rows"
+              value={results.rowCount}
+              icon="▤"
+            />
+
+            <StatCard
+              label="Total columns"
+              value={results.columnCount}
+              icon="▦"
+            />
+
+            <StatCard
+              label="Missing values"
+              value={missingTotal}
+              icon="!"
+            />
+
+            <StatCard
+              label="Type issues"
+              value={results.typeIssues ?? 0}
+              icon="⚠"
+            />
+
+            <StatCard
+              label="Completeness"
+              value={`${results.completeness ?? 0}%`}
+              icon="%"
+            />
+
+            <StatCard
+              label="Duplicate rows"
+              value={results.duplicateRows ?? 0}
+              icon="⧉"
+            />
+
           </div>
 
           <div className="table-card">
+
             <h3>Data Quality Summary</h3>
+
             <p>
               Profiling status:{" "}
               <strong style={{ color: statusColor(results.status) }}>
                 {results.status || "NOT AVAILABLE"}
               </strong>
             </p>
+
             <p>Total cells: {results.totalCells ?? 0}</p>
+
           </div>
 
           <div className="table-card">
+
             <h3>Column Quality Details</h3>
+
             <div className="table-scroll">
+
               <table>
+
                 <thead>
                   <tr>
                     <th>Column</th>
@@ -273,6 +353,7 @@ console.log("SHOULD DISPLAY REPORT:", Boolean(qualityResults));
                     <th>Type issues</th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {columns.map((column) => (
                     <tr key={column.column}>
@@ -285,30 +366,22 @@ console.log("SHOULD DISPLAY REPORT:", Boolean(qualityResults));
                     </tr>
                   ))}
                 </tbody>
+
               </table>
+
             </div>
           </div>
+
         </>
       )}
 
-{qualityResults && (
-  <div style={{
-    background: "yellow",
-    color: "black",
-    padding: "20px",
-    margin: "20px 0",
-    border: "3px solid red"
-  }}>
-    <h2>DATA QUALITY REPORT TEST</h2>
-    <p>File: {qualityResults.fileName}</p>
-    <p>Score: {qualityResults.qualityScore}%</p>
-    <p>Status: {qualityResults.status}</p>
-  </div>
-)}
-      {/* Standard quality report */}
+      {/* STANDARD QUALITY REPORT */}
+
       {qualityResults && (
         <>
+
           <div className="table-card">
+
             <h3>Data Quality Report</h3>
 
             <p>
@@ -322,6 +395,8 @@ console.log("SHOULD DISPLAY REPORT:", Boolean(qualityResults));
               </strong>
             </p>
 
+            {/* QUALITY SCORE AND PASS RATE */}
+
             <div
               style={{
                 display: "grid",
@@ -330,8 +405,11 @@ console.log("SHOULD DISPLAY REPORT:", Boolean(qualityResults));
                 margin: "20px 0",
               }}
             >
+
               <div className="table-card">
+
                 <p>Data Quality Score</p>
+
                 <h2
                   style={{
                     fontSize: "32px",
@@ -345,7 +423,9 @@ console.log("SHOULD DISPLAY REPORT:", Boolean(qualityResults));
                 >
                   {qualityResults.qualityScore ?? "N/A"}%
                 </h2>
+
                 <p>Validation checks passed</p>
+
                 <p style={{ fontSize: "13px", color: "#6b7280" }}>
                   {Math.max(
                     0,
@@ -354,6 +434,7 @@ console.log("SHOULD DISPLAY REPORT:", Boolean(qualityResults));
                   )}{" "}
                   of {qualityResults.totalRuleChecks ?? 0} checks passed
                 </p>
+
                 <div
                   style={{
                     height: "10px",
@@ -364,7 +445,10 @@ console.log("SHOULD DISPLAY REPORT:", Boolean(qualityResults));
                 >
                   <div
                     style={{
-                      width: `${Math.min(100, Math.max(0, qualityResults.qualityScore ?? 0))}%`,
+                      width: `${Math.min(
+                        100,
+                        Math.max(0, qualityResults.qualityScore ?? 0)
+                      )}%`,
                       height: "100%",
                       background:
                         qualityResults.qualityScore >= 95
@@ -375,16 +459,22 @@ console.log("SHOULD DISPLAY REPORT:", Boolean(qualityResults));
                     }}
                   />
                 </div>
+
               </div>
 
               <div className="table-card">
+
                 <p>Rule Pass Rate</p>
+
                 <h2 style={{ fontSize: "32px", color: "#2563eb" }}>
                   {qualityResults.rulePassRate ?? "N/A"}%
                 </h2>
+
                 <p>
-                  {qualityResults.passedRules} of {qualityResults.rulesChecked} rules passed
+                  {qualityResults.passedRules} of{" "}
+                  {qualityResults.rulesChecked} rules passed
                 </p>
+
                 <div
                   style={{
                     height: "10px",
@@ -395,33 +485,82 @@ console.log("SHOULD DISPLAY REPORT:", Boolean(qualityResults));
                 >
                   <div
                     style={{
-                      width: `${Math.min(100, Math.max(0, qualityResults.rulePassRate ?? 0))}%`,
+                      width: `${Math.min(
+                        100,
+                        Math.max(0, qualityResults.rulePassRate ?? 0)
+                      )}%`,
                       height: "100%",
                       background: "#2563eb",
                     }}
                   />
                 </div>
+
               </div>
+
             </div>
+
+            {/* QUALITY STATISTICS */}
 
             <div className="stats-grid">
-              <StatCard label="Rows checked" value={qualityResults.rowCount} icon="▤" />
-              <StatCard label="Rules checked" value={qualityResults.rulesChecked} icon="✓" />
-              <StatCard label="Passed rules" value={qualityResults.passedRules} icon="✓" />
-              <StatCard label="Failed rules" value={qualityResults.failedRules} icon="⚠" />
-              <StatCard label="Total issues" value={qualityResults.issueCount} icon="!" />
-              <StatCard label="Skipped rules" value={qualityResults.skippedRules} icon="—" />
+
+              <StatCard
+                label="Rows checked"
+                value={qualityResults.rowCount}
+                icon="▤"
+              />
+
+              <StatCard
+                label="Rules checked"
+                value={qualityResults.rulesChecked}
+                icon="✓"
+              />
+
+              <StatCard
+                label="Passed rules"
+                value={qualityResults.passedRules}
+                icon="✓"
+              />
+
+              <StatCard
+                label="Failed rules"
+                value={qualityResults.failedRules}
+                icon="⚠"
+              />
+
+              <StatCard
+                label="Total issues"
+                value={qualityResults.issueCount}
+                icon="!"
+              />
+
+              <StatCard
+                label="Skipped rules"
+                value={qualityResults.skippedRules}
+                icon="—"
+              />
+
             </div>
+
           </div>
 
-          {/* Failed rules */}
+          {/* FAILED RULES */}
+
           {qualityResults.failedRules > 0 && (
             <div
               className="table-card"
-              style={{ borderLeft: "5px solid crimson", marginBottom: "16px" }}
+              style={{
+                borderLeft: "5px solid crimson",
+                marginBottom: "16px",
+              }}
             >
-              <h3 style={{ color: "crimson" }}>Failed Validation Rules</h3>
-              <p>{qualityResults.failedRules} validation rule(s) failed.</p>
+
+              <h3 style={{ color: "crimson" }}>
+                Failed Validation Rules
+              </h3>
+
+              <p>
+                {qualityResults.failedRules} validation rule(s) failed.
+              </p>
 
               {rules
                 .filter((rule) => rule.status === "FAIL")
@@ -440,14 +579,20 @@ console.log("SHOULD DISPLAY REPORT:", Boolean(qualityResults));
                     <p>Issues found: {rule.issueCount}</p>
                   </div>
                 ))}
+
             </div>
           )}
 
-          {/* Validation rules table */}
+          {/* VALIDATION RULES TABLE */}
+
           <div className="table-card">
+
             <h3>Validation Rules</h3>
+
             <div className="table-scroll">
+
               <table>
+
                 <thead>
                   <tr>
                     <th>Rule</th>
@@ -457,6 +602,7 @@ console.log("SHOULD DISPLAY REPORT:", Boolean(qualityResults));
                     <th>Status</th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {rules.map((rule, index) => (
                     <tr key={`${rule.name}-${index}`}>
@@ -472,28 +618,40 @@ console.log("SHOULD DISPLAY REPORT:", Boolean(qualityResults));
                     </tr>
                   ))}
                 </tbody>
+
               </table>
+
             </div>
           </div>
 
-          {/* Detected issues */}
+          {/* DETECTED DATA QUALITY ISSUES */}
+
           <div className="table-card">
+
             <h3>Detected Data Quality Issues</h3>
 
             {issues.length === 0 ? (
-              <p>No validation issues found. All applicable rules passed.</p>
+              <p>
+                No validation issues found. All applicable rules passed.
+              </p>
             ) : (
               <>
+
                 <p>
                   Found <strong>{issues.length}</strong> issues.
                 </p>
 
-                <button className="primary-button" onClick={handleDownloadIssues}>
+                <button
+                  className="primary-button"
+                  onClick={handleDownloadIssues}
+                >
                   Download Issues CSV
                 </button>
 
                 <div className="table-scroll">
+
                   <table>
+
                     <thead>
                       <tr>
                         <th>CSV row</th>
@@ -503,9 +661,12 @@ console.log("SHOULD DISPLAY REPORT:", Boolean(qualityResults));
                         <th>Problem</th>
                       </tr>
                     </thead>
+
                     <tbody>
                       {issues.map((issue, index) => (
-                        <tr key={`${issue.rule}-${issue.rowNumber}-${index}`}>
+                        <tr
+                          key={`${issue.rule}-${issue.rowNumber}-${index}`}
+                        >
                           <td>{issue.rowNumber}</td>
                           <td>{issue.column}</td>
                           <td>{issue.value || "(empty)"}</td>
@@ -514,13 +675,19 @@ console.log("SHOULD DISPLAY REPORT:", Boolean(qualityResults));
                         </tr>
                       ))}
                     </tbody>
+
                   </table>
+
                 </div>
+
               </>
             )}
+
           </div>
+
         </>
       )}
+
     </section>
   );
 }

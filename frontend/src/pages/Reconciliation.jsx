@@ -3,8 +3,14 @@ import FilePicker from "../components/FilePicker";
 import StatCard from "../components/StatCard";
 import "./recolination.css";
 
-const API_URL =
-  "http://localhost:5000/api/profile/reconcile-records";
+// ----------------------------------
+// API CONFIGURATION FROM .env
+// ----------------------------------
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+const API_URL = `${API_BASE_URL}/api/profile/reconcile-records`;
 
 export default function Reconciliation({
   reconcileResults,
@@ -14,7 +20,11 @@ export default function Reconciliation({
   targetFile,
   setTargetFile,
 }) {
-  // Run source-to-target reconciliation
+
+  // ----------------------------------
+  // RUN SOURCE-TO-TARGET RECONCILIATION
+  // ----------------------------------
+
   async function handleReconcile() {
     if (!sourceFile || !targetFile) {
       alert("Please select both source and target CSV files.");
@@ -45,17 +55,21 @@ export default function Reconciliation({
       }
 
       setReconcileResults(data);
+
     } catch (error) {
       setReconcileResults({
         _error:
           error.message === "Failed to fetch"
-            ? "Cannot connect to the backend on port 5000."
+            ? "Cannot connect to the backend. Check that it is running."
             : error.message,
       });
     }
   }
 
-  // Download JSON report
+  // ----------------------------------
+  // DOWNLOAD JSON REPORT
+  // ----------------------------------
+
   function downloadJSON(report, filename) {
     const blob = new Blob(
       [JSON.stringify(report, null, 2)],
@@ -75,7 +89,10 @@ export default function Reconciliation({
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
-  // Download full reconciliation report
+  // ----------------------------------
+  // DOWNLOAD FULL RECONCILIATION REPORT
+  // ----------------------------------
+
   function downloadFullReport() {
     if (
       !reconcileResults ||
@@ -97,7 +114,10 @@ export default function Reconciliation({
     );
   }
 
-  // Download mismatch report
+  // ----------------------------------
+  // DOWNLOAD MISMATCH REPORT
+  // ----------------------------------
+
   function downloadMismatchReport() {
     if (
       !reconcileResults ||
@@ -120,6 +140,10 @@ export default function Reconciliation({
     );
   }
 
+  // ----------------------------------
+  // DERIVED DATA
+  // ----------------------------------
+
   const loading = reconcileResults?._loading === true;
   const error = reconcileResults?._error;
 
@@ -128,13 +152,19 @@ export default function Reconciliation({
       ? reconcileResults
       : null;
 
+  // ----------------------------------
+  // UI
+  // ----------------------------------
+
   return (
     <section className="content-section reconciliation-page">
 
-      {/* Page Header */}
+      {/* PAGE HEADER */}
+
       <div className="section-heading">
         <div>
           <h2>Source-to-Target Reconciliation</h2>
+
           <p>
             Compare records between two CSV files and identify
             missing, extra, or mismatched data.
@@ -142,10 +172,12 @@ export default function Reconciliation({
         </div>
       </div>
 
-      {/* File Upload Section */}
+      {/* FILE UPLOAD SECTION */}
+
       <div className="upload-card">
 
         <div className="file-columns">
+
           <FilePicker
             title="Source CSV"
             subtitle="Select your original dataset"
@@ -165,6 +197,7 @@ export default function Reconciliation({
               setReconcileResults(null);
             }}
           />
+
         </div>
 
         <p className="helper-text">
@@ -192,13 +225,18 @@ export default function Reconciliation({
             {error}
           </p>
         )}
+
       </div>
 
-      {/* Reconciliation Results */}
+      {/* RECONCILIATION RESULTS */}
+
       {results && (
         <>
-          {/* Results Header */}
+
+          {/* RESULTS HEADER */}
+
           <div className="results-heading">
+
             <div>
               <p className="eyebrow">
                 RECONCILIATION REPORT
@@ -223,9 +261,11 @@ export default function Reconciliation({
             >
               {results.status}
             </span>
+
           </div>
 
-          {/* Statistics */}
+          {/* STATISTICS */}
+
           <div className="stats-grid">
 
             <StatCard
@@ -266,8 +306,10 @@ export default function Reconciliation({
 
           </div>
 
-          {/* Schema Validation */}
+          {/* SCHEMA VALIDATION */}
+
           <div className="table-card">
+
             <h3>Schema Validation</h3>
 
             <p>
@@ -290,9 +332,11 @@ export default function Reconciliation({
                 {results.extraColumnsInTarget.join(", ")}
               </p>
             )}
+
           </div>
 
-          {/* Report Downloads */}
+          {/* REPORT DOWNLOADS */}
+
           <div className="report-actions">
 
             <button
@@ -307,14 +351,13 @@ export default function Reconciliation({
               type="button"
               className="secondary-button"
               onClick={downloadMismatchReport}
-              disabled={
-                !results.mismatchedRecords?.length
-              }
+              disabled={!results.mismatchedRecords?.length}
             >
               Download Mismatches Only
             </button>
 
           </div>
+
         </>
       )}
 

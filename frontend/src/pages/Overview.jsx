@@ -9,7 +9,7 @@ export default function Overview({
   etlError,
   onRunETL,
   onNavigate,
-})  {
+}) {
   const columns = results?.columns || [];
 
   const missingValues = columns.reduce(
@@ -40,15 +40,17 @@ export default function Overview({
       icon: "⇄",
     },
     {
-    label: "ETL Status",
-    value: etlResults?.status || "Not Run",
-    icon: "⚙",
-  },
+      label: "ETL Status",
+      value: etlResults?.status || "Not Run",
+      icon: "⚙",
+    },
   ];
 
   return (
     <section className="content-section">
-      {/* Welcome section */}
+
+      {/* WELCOME SECTION */}
+
       <div className="welcome-banner">
         <div>
           <p className="eyebrow">DATA QUALITY WORKSPACE</p>
@@ -64,38 +66,32 @@ export default function Overview({
         <div className="welcome-icon">▦</div>
       </div>
 
-{/* PySpark ETL Pipeline */}
-<div className="section-heading">
-  <div>
-    <h2>PySpark ETL Pipeline</h2>
-    <p>Execute data extraction, transformation and validation.</p>
-  </div>
+      {/* PYSPARK ETL PIPELINE */}
 
-  <button
-    type="button"
-    className="quick-link"
-    onClick={onRunETL}
-    disabled={etlLoading}
-  >
-    {etlLoading ? "Running ETL..." : "Run ETL"}
-  </button>
-</div>
+      <div className="section-heading">
+        <div>
+          <h2>PySpark ETL Pipeline</h2>
+          <p>
+            Execute data extraction, transformation and validation.
+          </p>
+        </div>
 
-{etlError && (
-  <p className="helper-text">{etlError}</p>
-)}
+        <button
+          type="button"
+          className="quick-link"
+          onClick={onRunETL}
+          disabled={etlLoading}
+        >
+          {etlLoading ? "Running ETL..." : "Run ETL"}
+        </button>
+      </div>
 
-<div className="stats-grid">
-  {stats.map((stat) => (
-    <StatCard
-      key={stat.label}
-      label={stat.label}
-      value={stat.value}
-      icon={stat.icon}
-    />
-  ))}
-</div>
-      {/* Dynamic statistics */}
+      {etlError && (
+        <p className="helper-text">{etlError}</p>
+      )}
+
+      {/* WORKSPACE STATISTICS */}
+
       <div className="section-heading">
         <div>
           <h2>Workspace Overview</h2>
@@ -114,7 +110,8 @@ export default function Overview({
         ))}
       </div>
 
-      {/* Quick actions */}
+      {/* QUICK ACTIONS */}
+
       <div className="section-heading">
         <div>
           <h2>Quick Actions</h2>
@@ -123,6 +120,7 @@ export default function Overview({
       </div>
 
       <div className="quick-grid">
+
         <button
           type="button"
           className="quick-card"
@@ -164,9 +162,11 @@ export default function Overview({
           </p>
           <span className="quick-link">View reports →</span>
         </button>
+
       </div>
 
-      {/* Latest activity */}
+      {/* LATEST ACTIVITY */}
+
       <div className="table-card">
         <h3>Latest Activity</h3>
 
@@ -177,9 +177,11 @@ export default function Overview({
           </p>
         ) : (
           <div className="activity-list">
+
             {results && (
               <div className="activity-item">
                 <span className="activity-dot" />
+
                 <div>
                   <strong>CSV profiling completed</strong>
                   <p>
@@ -194,6 +196,7 @@ export default function Overview({
             {reconcileResults && (
               <div className="activity-item">
                 <span className="activity-dot" />
+
                 <div>
                   <strong>Reconciliation completed</strong>
                   <p>
@@ -206,9 +209,11 @@ export default function Overview({
                 </div>
               </div>
             )}
+
           </div>
         )}
       </div>
+
     </section>
   );
 }
