@@ -1,0 +1,275 @@
+
+/* ==================================
+   DATAOPS ONE - DATA PROFILING
+================================== */
+
+.dataops-dashboard {
+  --do-navy: #14243a;
+  --do-teal: #0d9488;
+  --do-teal-light: #ccfbf1;
+  --do-bg: #f5f8fc;
+  --do-border: #e2e8f0;
+  --do-text: #1e293b;
+  --do-muted: #64748b;
+
+  background: var(--do-bg);
+  color: var(--do-text);
+  padding: 28px;
+  border-radius: 16px;
+  min-height: 100vh;
+}
+
+/* Dashboard heading */
+
+.dataops-dashboard .section-heading {
+  margin-bottom: 26px;
+}
+
+.dataops-dashboard .section-heading h2 {
+  color: var(--do-navy);
+  font-size: 28px;
+  font-weight: 750;
+  margin-bottom: 8px;
+}
+
+.dataops-dashboard .section-heading p {
+  color: var(--do-muted);
+  font-size: 14px;
+}
+
+/* Upload panel */
+
+.dataops-dashboard .upload-card {
+  background: #ffffff;
+  border: 1px solid var(--do-border);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+}
+
+.dataops-dashboard .primary-button {
+  background: var(--do-teal);
+  color: #ffffff;
+  border: none;
+  border-radius: 9px;
+  padding: 11px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.dataops-dashboard .primary-button:hover:not(:disabled) {
+  background: #0f766e;
+  transform: translateY(-1px);
+}
+
+.dataops-dashboard .primary-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Metric cards layout */
+
+.dataops-dashboard .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin: 24px 0;
+}
+
+/* Style direct metric card children */
+
+.dataops-dashboard .stats-grid > * {
+  background: #ffffff;
+  border: 1px solid var(--do-border);
+  border-radius: 14px;
+  padding: 20px;
+  min-width: 0;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+}
+
+/* Report and table panels */
+
+.dataops-dashboard .table-card {
+  background: #ffffff;
+  border: 1px solid var(--do-border);
+  border-radius: 14px;
+  padding: 22px;
+  margin-bottom: 20px;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+}
+
+.dataops-dashboard .table-card h3 {
+  color: var(--do-navy);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+/* Tables */
+
+.dataops-dashboard .table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.dataops-dashboard table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 650px;
+}
+
+.dataops-dashboard th {
+  background: #f1f5f9;
+  color: #475569;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 14px;
+  white-space: nowrap;
+}
+
+.dataops-dashboard td {
+  color: var(--do-text);
+  font-size: 13px;
+  padding: 14px;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.dataops-dashboard tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* Error messages */
+
+.dataops-dashboard .error {
+  color: #dc2626;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 14px;
+}
+
+/* Responsive design */
+
+@media (max-width: 900px) {
+  .dataops-dashboard .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .dataops-dashboard {
+    padding: 14px;
+  }
+
+  .dataops-dashboard .section-heading h2 {
+    font-size: 22px;
+  }
+
+  .dataops-dashboard .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dataops-dashboard .upload-card,
+  .dataops-dashboard .table-card {
+    padding: 16px;
+  }
+}
+
+
+/* ==================================
+   DATAOPS ONE - ENHANCED STAT CARDS
+================================== */
+
+.dataops-dashboard .stat-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 20px;
+  min-height: 125px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dataops-dashboard .stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.07);
+}
+
+.dataops-dashboard .stat-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.dataops-dashboard .stat-label {
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dataops-dashboard .stat-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.dataops-dashboard .stat-card-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dataops-dashboard .stat-value {
+  font-size: 29px;
+  font-weight: 750;
+  color: #14243a;
+}
+
+.dataops-dashboard .stat-indicator {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.dataops-dashboard .stat-indicator.success {
+  color: #15803d;
+}
+
+.dataops-dashboard .stat-indicator.warning {
+  color: #d97706;
+}
+
+.dataops-dashboard .stat-indicator.default {
+  color: #64748b;
+}
+
+/* Healthy card */
+
+.dataops-dashboard .stat-card-success .stat-icon {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+/* Warning card */
+
+.dataops-dashboard .stat-card-warning .stat-icon {
+  background: #fef3c7;
+  color: #d97706;
+}
+

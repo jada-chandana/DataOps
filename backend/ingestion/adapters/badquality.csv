@@ -1,0 +1,7 @@
+
+Employee_ID,Name,Department,Age,City,Salary
+E001,Ravi,IT,25,Hyderabad,45000
+E002,Sita,HR,,Chennai,50000
+E003,Arun,IT,twenty,Hyderabad,40000
+E004,Ravi,IT,25,Hyderabad,45000
+E005,Kiran,Finance,30,,abc

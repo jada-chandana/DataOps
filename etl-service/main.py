@@ -1,4 +1,4 @@
-
+import json
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import (
     col, trim, expr, when, count, concat_ws
@@ -117,6 +117,18 @@ if rejected_count > 0:
 else:
     print("SUCCESS: All records passed validation")
 
+summary = {
+    "success": True,
+    "totalRecords": source_count,
+    "validRecords": valid_count,
+    "rejectedRecords": rejected_count,
+    "status": "WARNING" if rejected_count > 0 else "SUCCESS"
+}
+
+with open("output/etl_summary.json", "w") as file:
+    json.dump(summary, file, indent=4)
+
 print("\n========== PIPELINE COMPLETED ==========")
+print("Structured summary saved: output/etl_summary.json")
 
 spark.stop()

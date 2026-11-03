@@ -4,10 +4,11 @@ import dotenv from "dotenv";
 import ProfileRoutes from "./routes/ProfileRoutes.js"
 import ValidationRoutes from "./routes/validationRoutes.js";
 import CleaningRoutes from "./routes/cleaningRoutes.js";
-import ETLRoutes from "./routes/etlRoutes.js"
+import ETLRoutes from "./routes/etlRoutes.js";
+import IngestionRoutes from "./routes/ingestionRoutes.js";
 dotenv.config();
 const app=express();
-const PORT=process.env.port||5000;
+const PORT=process.env.PORT||5000;
 
 app.use(cors())
 app.use(express.json())
@@ -15,8 +16,9 @@ app.use("/api/profile", ProfileRoutes);
 app.use("/api/validation", ValidationRoutes);
 app.use("/api/cleaning",CleaningRoutes);
 app.use("/api/etl", ETLRoutes);
+app.use("/api/ingestion", IngestionRoutes);
 app.get("/",(req,res)=>{
-res.json=({
+res.json({
 message:"welcome to dataops",
 status:"running"
 })

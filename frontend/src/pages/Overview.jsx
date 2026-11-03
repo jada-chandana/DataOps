@@ -4,8 +4,12 @@ import StatCard from "../components/StatCard";
 export default function Overview({
   results,
   reconcileResults,
+  etlResults,
+  etlLoading,
+  etlError,
+  onRunETL,
   onNavigate,
-}) {
+})  {
   const columns = results?.columns || [];
 
   const missingValues = columns.reduce(
@@ -35,6 +39,11 @@ export default function Overview({
       value: reconcileResults?.mismatchedCount,
       icon: "⇄",
     },
+    {
+    label: "ETL Status",
+    value: etlResults?.status || "Not Run",
+    icon: "⚙",
+  },
   ];
 
   return (
@@ -55,6 +64,37 @@ export default function Overview({
         <div className="welcome-icon">▦</div>
       </div>
 
+{/* PySpark ETL Pipeline */}
+<div className="section-heading">
+  <div>
+    <h2>PySpark ETL Pipeline</h2>
+    <p>Execute data extraction, transformation and validation.</p>
+  </div>
+
+  <button
+    type="button"
+    className="quick-link"
+    onClick={onRunETL}
+    disabled={etlLoading}
+  >
+    {etlLoading ? "Running ETL..." : "Run ETL"}
+  </button>
+</div>
+
+{etlError && (
+  <p className="helper-text">{etlError}</p>
+)}
+
+<div className="stats-grid">
+  {stats.map((stat) => (
+    <StatCard
+      key={stat.label}
+      label={stat.label}
+      value={stat.value}
+      icon={stat.icon}
+    />
+  ))}
+</div>
       {/* Dynamic statistics */}
       <div className="section-heading">
         <div>

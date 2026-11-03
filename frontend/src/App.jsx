@@ -55,6 +55,9 @@ export default function App() {
   const [profileResults, setProfileResults] = useState(null);
 
   const [reconcileResults, setReconcileResults] = useState(null);
+  const [etlResults, setEtlResults] = useState(null);
+const [etlLoading, setEtlLoading] = useState(false);
+const [etlError, setEtlError] = useState("");
   const [sourceFile, setSourceFile] = useState(null);
   const [targetFile, setTargetFile] = useState(null);
   const [keyColumn, setKeyColumn] = useState("");
@@ -63,6 +66,33 @@ export default function App() {
     setActivePage(page);
     setSidebarOpen(false);
   }
+  async function handleRunETL() {
+  try {
+    setEtlLoading(true);
+    setEtlError("");
+    setEtlResults(null);
+
+    const response = await fetch(
+      "http://localhost:5000/api/etl/run",
+      {
+        method: "POST",
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "ETL pipeline failed");
+    }
+
+    setEtlResults(data);
+
+  } catch (error) {
+    setEtlError(error.message);
+  } finally {
+    setEtlLoading(false);
+  }
+}
 
   function downloadJSON(report, filename) {
     const blob = new Blob(
@@ -139,9 +169,13 @@ export default function App() {
         <div className="page-content">
           {activePage === "overview" && (
             <Overview
-  results={profileResults}
-  reconcileResults={reconcileResults}
-  onNavigate={navigate}
+results={profileResults}
+    reconcileResults={reconcileResults}
+    etlResults={etlResults}
+    etlLoading={etlLoading}
+    etlError={etlError}
+    onRunETL={handleRunETL}
+    onNavigate={navigate}
 />
           )}
 
