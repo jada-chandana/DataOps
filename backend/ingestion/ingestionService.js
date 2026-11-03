@@ -12,7 +12,7 @@ export function ingestCSV(file) {
   const rows = dataset.records.map((record) =>
     headers.map((header) => record[header] ?? "")
   );
-  console.log("ROWS FOR PROFILING:", rows);
+  // console.log("ROWS FOR PROFILING:", rows);
 
   // Step 3: Run data profiling
   const qualityReport = profileCSVData(
